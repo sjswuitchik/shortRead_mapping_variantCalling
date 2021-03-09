@@ -120,7 +120,8 @@ rule gatherVcfs:
     output: 
         vcf =  temp(config["gatkDir"] + "Combined.vcf"),
         vcfidx =  temp(config["gatkDir"] + "Combined.vcf.idx"),
-        vcfFiltered =  config["gatkDir"] + "Combined_hardFiltered.vcf"
+        vcfFiltered =  config["gatkDir"] + "Combined_hardFiltered.vcf",
+        vcfComp = config["gatkDir"] + "Combined_hardFiltered.vcf.gz"
     params:
         gatherVcfsInput = helperFun.getVcfs_gatk(LISTS, vcfDir)
     conda:
@@ -141,7 +142,9 @@ rule gatherVcfs:
         "--filter-name \"FS_SOR_filter\" "
         "--filter-expression \"(vc.isSNP() && ((vc.hasAttribute('FS') && FS > 60.0) || (vc.hasAttribute('SOR') &&  SOR > 3.0))) || ((vc.isIndel() || vc.isMixed()) && ((vc.hasAttribute('FS') && FS > 200.0) || (vc.hasAttribute('SOR') &&  SOR > 10.0)))\" "
         "--filter-name \"MQ_filter\" "
-        "--filter-expression \"vc.isSNP() && ((vc.hasAttribute('MQ') && MQ < 40.0) || (vc.hasAttribute('MQRankSum') && MQRankSum < -12.5))\" "
+        "--filter-expression \"vc.isSNP() && ((vc.hasAttribute('MQ') && MQ < 40.0) || (vc.hasAttribute('MQRankSum') && MQRankSum < -12.5))\" \n"  
+        
+        "bcftools view -O z {output.vcfFiltered} > {output.vcfComp}"
 
 rule vcftools:
     input:
