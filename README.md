@@ -1,3 +1,5 @@
+## NB: this fork from master is under development and may not be functional at any given time from start to finish
+
 # Automated short-read mapping and variant calling
 
 ## Design
