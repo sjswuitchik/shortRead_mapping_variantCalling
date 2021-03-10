@@ -144,7 +144,7 @@ rule gatherVcfs:
         "--filter-name \"MQ_filter\" "
         "--filter-expression \"vc.isSNP() && ((vc.hasAttribute('MQ') && MQ < 40.0) || (vc.hasAttribute('MQRankSum') && MQRankSum < -12.5))\" \n"  
         
-        "gzip {output.vcfFiltered} > {output.vcfComp}"
+        "bgzip {output.vcfFiltered} -i > {output.vcfComp}"
 
 rule vcftools:
     input:
