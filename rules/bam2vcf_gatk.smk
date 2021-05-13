@@ -144,9 +144,22 @@ rule gatherVcfs:
         "--filter-expression \"vc.isSNP() && ((vc.hasAttribute('MQ') && MQ < 40.0) || (vc.hasAttribute('MQRankSum') && MQRankSum < -12.5))\" "
         "--invalidate-previous-filters"
 
+rule compress:
+    input:
+        vcf = gatkDir + "Combined_hardFiltered.vcf"
+    output:
+        vcf = gatkDir + "Combined_hardFiltered.vcf.gz",
+        idx = gatkDir + "Combined_hardFiltered.vcf.gz.tbi"
+    conda:
+        "../envs/bam2vcf.yml"
+    resources:
+        mem_mb = lambda wildcards, attempt: attempt * res_config['vcftools']['mem']    # this is the overall memory requested
+    shell:
+        "bgzip {input.vcf} && tabix -p vcf {output.vcf}"
+
 rule vcftools:
     input:
-        vcf = gatkDir + "Combined_hardFiltered.vcf",
+        vcf = gatkDir + "Combined_hardFiltered.vcf.gz",
         int = intDir + "intervals_fb.bed"
     output: 
         missing = gatkDir + "missing_data_per_ind.txt",
@@ -156,5 +169,5 @@ rule vcftools:
     resources:
         mem_mb = lambda wildcards, attempt: attempt * res_config['vcftools']['mem']    # this is the overall memory requested
     shell:
-        "vcftools --vcf {input.vcf} --remove-filtered-all --minDP 1 --stdout --missing-indv > {output.missing}\n"
+        "vcftools --gzvcf {input.vcf} --remove-filtered-all --minDP 1 --stdout --missing-indv > {output.missing}\n"
         "bedtools intersect -a {input.int} -b {input.vcf} -c > {output.SNPsPerInt}"
