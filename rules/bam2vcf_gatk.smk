@@ -146,10 +146,10 @@ rule gatherVcfs:
 
 rule compress:
     input:
-        vcf = gatkDir + "Combined_hardFiltered.vcf"
+        vcf = config["gatkDir"] + "Combined_hardFiltered.vcf"
     output:
-        vcf = gatkDir + "Combined_hardFiltered.vcf.gz",
-        idx = gatkDir + "Combined_hardFiltered.vcf.gz.tbi"
+        vcf = config["gatkDir"] + "Combined_hardFiltered.vcf.gz",
+        idx = config["gatkDir"] + "Combined_hardFiltered.vcf.gz.tbi"
     conda:
         "../envs/bam2vcf.yml"
     resources:
@@ -159,7 +159,7 @@ rule compress:
 
 rule vcftools:
     input:
-        vcf = gatkDir + "Combined_hardFiltered.vcf.gz",
+        vcf = config["gatkDir"] + "Combined_hardFiltered.vcf.gz",
         int = intDir + "intervals_fb.bed"
     output: 
         missing = gatkDir + "missing_data_per_ind.txt",
